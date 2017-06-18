@@ -7,15 +7,17 @@
 \item \texttt{hi-nginx}安装路径，可选，默认\path{/home/centos7/nginx}
 \end{itemize}
 用户可以通过\texttt{-h}或者\texttt{--help}参看使用说明。
+
+
 \subsection{hello world}
 \texttt{hello world}工程包含了\texttt{hi-nginx} \texttt{web application}开发的最基本要素。
 \subsubsection{cpp}
-首先使用\texttt{hi-project}脚本创建一个\texttt{cpp}工程，名为hello：
+使用\texttt{hi-project}脚本创建一个\texttt{cpp}工程，名为\texttt{hello}：
 \begin{lstlisting}
 /home/centos7/nginx/hi/hi-project hello cpp /home/centos7/nginx
 \end{lstlisting}
 后面两个参数是可省的。
-这时，\texttt{hi-project}会创建一个名为hello的目录，并在该目录中创建两个文件，一个是\path{Makefile}，一个是\path{hello.cpp}。前者帮助用户在执行\texttt{make \&\& make install }时把\texttt{web application}编译、安装至正确位置；后者则帮助用户正确创建合乎\texttt{hi-nginx}要求的\texttt{class}：
+这时，\texttt{hi-project}会创建一个名为\path{hello}的目录，并在该目录中创建两个文件，一个是\path{Makefile}，一个是\path{hello.cpp}。前者帮助用户在执行\texttt{make \&\& make install }时把\texttt{web application}编译、安装至正确位置；后者则帮助用户正确创建合乎\texttt{hi-nginx}要求的\texttt{class}：
 \begin{lstlisting}
 #include "servlet.hpp"
 
@@ -42,12 +44,107 @@ extern "C" void destroy(hi::servlet* p) {
     delete p;
 }
 \end{lstlisting}
-以上代码一目了然，无需过多解释，任何熟知\texttt{c++}的程序员都能看懂。没错，\texttt{hi-nginx}并不要求\texttt{cpp}程序员“精通”自己的工具，只需熟知即可。当然，熟知\texttt{http}协议是必要的，否则很难正确地使用\texttt{request}类和\texttt{response}类。
+以上代码一目了然，无需过多解释，任何熟知\texttt{c++}的程序员都能看懂。没错，\texttt{hi-nginx}并不要求\texttt{cpp}程序员“精通”自己的工具，只需熟知即可。当然，熟知\texttt{http}协议是必要的，否则很难正确地使用\texttt{request}类和\texttt{response}类。如何使用这两个类，下文会详述。在此先按下不表。
 
-\texttt{request}类包含了客户端访问\texttt{hi-nginx}	时所携带的信息。
+用户\texttt{make \&\& make install}之后，\texttt{hi-project}后把编译生成的\path{hello.so}安装在\path{/home/centos7/nginx/hi}目录下。要启用这个\texttt{web application}，只需在\texttt{hi-nginx}的配置文件中加入：
+\begin{lstlisting}
+location = /hello {
+	hi hi/hello.so;
+}
+\end{lstlisting}
+然后，\texttt{hi-nginx}执行\texttt{reload} 即可。
+
 
 \subsubsection{python}
+使用\texttt{hi-project}脚本创建一个\texttt{python}工程，名为\texttt{python}：
+\begin{lstlisting}
+/home/centos7/nginx/hi/hi-project python python /home/centos7/nginx
+\end{lstlisting}
+最后一个参数是可省的。\texttt{hi-project}会创建一个名为\path{python}的目录，并在该目录中创建两个文件，一个是\path{Makefile}，一个是\path{python.py}。前者的作用如上。后者很简单：
+\begin{lstlisting}
+hi_res.status(200)
+hi_res.content('hello,python')
+\end{lstlisting}
+用户可以把其他\texttt{python}类型的\texttt{web}应用全放在\path{python}目录下，它们都能被正确安装。
 \subsubsection{lua}
+使用\texttt{hi-project}脚本创建一个\texttt{lua}工程，名为\texttt{lua}：
+\begin{lstlisting}
+/home/centos7/nginx/hi/hi-project luahello lua /home/centos7/nginx
+\end{lstlisting}
+最后一个参数是可省的。\texttt{hi-project}会创建一个名为\path{lua}的目录，并在该目录中创建两个文件，一个是\path{Makefile}，一个是\path{lua.lua}。前者的作用如上。后者很简单：
+\begin{lstlisting}
+hi_res:status(200)
+hi_res:content('hello,lua')
+\end{lstlisting}
+用户可以把其他\texttt{lua}类型的\texttt{web}应用全放在\path{lua}目录下，它们都能被正确安装。
+
+
+\subsection{请求类}
+\texttt{hi-nginx}把请求分解为以下几个部分：
+\begin{itemize}
+\item 一般信息
+	\begin{itemize}
+		\item client
+		\item user_agent
+		\item method
+		\item uri
+		\item param
+	\end{itemize}
+\item headers头信息，需要开启\texttt{hi_need_headers}
+\item form表单信息
+\item cookies信息，需要开启\texttt{hi_need_cookies}
+\item session会话信息，需要开启\texttt{hi_need_session}并配置\texttt{hi_redis_host}和\texttt{hi_redis_port}
+\end{itemize}
+用户可以通过配合“开关指令”获取想要的信息。
+\subsection{响应类}
+\texttt{hi-nginx}把响应分解为四个部分：
+\begin{itemize}
+\item status，状态码
+\item headers，响应头
+\item content，响应体
+\item session，会话信息
+\end{itemize}
+用户通过以上四个变量操纵\texttt{hi-nginx}应答请求。
+
+\subsection{指令详解}
+\subsubsection{hi}
+这个指令负责装载\texttt{cpp application}。它接受一个参数，参数值为动态\texttt{*.so}的动态链接库。
+\subsubsection{hi_need_cache}
+这个指令负责开关缓存管理器。\texttt{hi-nginx}的缓存管理器采用的时间过期和最近最少使用算法相结合的缓存管理策略。用户可以结合以下命令控制缓存管理器
+\begin{itemize}
+\item \texttt{hi_cache_size}
+\item \texttt{hi_cache_expires}
+\end{itemize}
+\subsubsection{hi_need_headers}
+这个指令负责开关http头信息获取。
+\subsubsection{hi_need_cookies}
+这个指令负责开关http cookie信息获取
+\subsubsection{hi_need_session}
+这个指令负责开关http session会话管理器。\texttt{hi-nginx}通过\texttt{redis}服务器来管理会话数据，因此，用户应该在打开这个开关的同时配置以下两项：
+\begin{itemize}
+\item \texttt{hi_redis_host}
+\item \texttt{hi_redis_port}
+\end{itemize}
+此外，用户还可以通过\texttt{hi_session_expires}指令配置会话过期时间。
+
+会话管理器与\texttt{hi_need_cookies}是同步打开的，\texttt{hi-nginx}需要通过cookie设置客户端唯一识别ID，而且限定识别ID必须具有SESSIONID名。用户可以使用\texttt{nginx}内置模块\texttt{ngx_http_userid_module}来配置识别ID，例如：
+\begin{lstlisting}
+	userid on;
+	userid_name SESSIONID;
+	userid_domain localhost;
+	userid_path /;
+\end{lstlisting}
+\subsubsection{hi_py_content}
+这个指令负责运行\texttt{python}内容块
+\subsubsection{hi_py_script}
+这个指令负责运行\texttt{python}脚本，它接受一个参数，可指定查找脚本的目录。
+\subsubsection{hi_lua_content}
+这个指令负责运行\texttt{lua}内容块
+\subsubsection{hi_lua_script}
+这个指令负责运行\texttt{lua}脚本，它接受一个参数，可指定查找脚本的目录。
+
+
+
 
 
 
