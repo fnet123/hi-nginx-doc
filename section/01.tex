@@ -44,7 +44,7 @@ sudo yum install gcc gcc-c++ make pcre-devel zlib-devel openssl-devel hiredis-de
 
 但是，既然已经安装好了\texttt{hi-nginx}，在正式使用它之前，就应该测试一下它\texttt{application server}功能，确保安装的成功。为此，用户需要做两件事情。第一件事情是安装\texttt{redis}服务器，因为\texttt{hi-nginx}的会话功能需要它。安装的方法也很简单：\texttt{sudo yum install redis}。第二件事情是下载\url{https://github.com/webcpp/hi_demo}上的演示代码。\texttt{git clone https://github.com/webcpp/hi_demo.git}即可。演示代码假定\texttt{hi-nginx}的安装目录为\path{/home/centos7/nginx}，执行\texttt{make \&\& make install}即可。如果安装目录不同于此，需修改\texttt{hi_demo}目录下\texttt{Makefile}中\texttt{NGINX_INSTALL_DIR}变量的值。
 
-\texttt{hi_demo}目录下有两个特殊文件，一个是\texttt{demo.html}，一个是\texttt{demo.conf}。前者可带领用户测试\texttt{hi-nginx}，后者则用户配置\texttt{hi-nginx}以正确加载\texttt{hi_demo}。
+\texttt{hi_demo}目录下有两个特殊文件，一个是\texttt{demo.html}，一个是\texttt{demo.conf}。前者可带领用户测试\texttt{hi-nginx}，后者则用于配置\texttt{hi-nginx}以正确加载\texttt{hi_demo}。
 用户执行以下命令就可以正确安装这两个文件：
 \begin{lstlisting}
 install demo.html /home/centos7/nginx/html
