@@ -96,6 +96,30 @@ hi_res:content('hello,lua')
 \item session会话信息，需要开启\texttt{hi_need_session}并配置\texttt{hi_redis_host}和\texttt{hi_redis_port}
 \end{itemize}
 用户可以通过配合“开关指令”获取想要的信息。
+\subsubsection{python api}
+\texttt{python}用户可以通过类实例\texttt{hi_req}结合以下方法获取想要的信息：
+\begin{itemize}
+\item client
+\item user_agent
+\item method
+\item uri
+\item param
+\item has_xxx 
+\item get_xxx
+\end{itemize}
+其中\texttt{xxx}可取值\texttt{header}，\texttt{form}，\texttt{session}和\texttt{cookie}。
+\subsubsection{lua api}
+\texttt{lua}用户可以通过类实例\texttt{hi_req}结合以下方法获取想要的信息：
+\begin{itemize}
+\item client
+\item user_agent
+\item method
+\item uri
+\item param
+\item has_xxx 
+\item get_xxx
+\end{itemize}
+其中\texttt{xxx}可取值\texttt{header}，\texttt{form}，\texttt{session}和\texttt{cookie}。
 \subsection{响应类}
 \texttt{hi-nginx}把响应分解为四个部分：
 \begin{itemize}
@@ -105,6 +129,23 @@ hi_res:content('hello,lua')
 \item session，会话信息
 \end{itemize}
 用户通过以上四个变量操纵\texttt{hi-nginx}应答请求。
+\subsubsection{python api}
+\texttt{python}用户可以通过类实例\texttt{hi_res}结合以下方法写入想要的响应：
+\begin{itemize}
+\item status
+\item header
+\item content
+\item session
+\end{itemize}
+\subsubsection{lua api}
+\texttt{lua}用户可以通过类实例\texttt{hi_res}结合以下方法写入想要的响应：
+\begin{itemize}
+\item status
+\item header
+\item content
+\item session
+\end{itemize}
+
 
 \subsection{指令详解}
 \subsubsection{hi}
